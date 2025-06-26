@@ -39,5 +39,5 @@ Whiteboard is a lightweight, collaborative sketching app built using **React** a
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/whiteboard.git
+git git clone https://github.com/Ajayendra2705/Whiteboard.git
 cd whiteboard
