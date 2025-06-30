@@ -92,15 +92,20 @@ const boardReducer = (state, action) => {
     }
     case BOARD_ACTIONS.ERASE: {
       const { clientX, clientY } = action.payload;
-      let newElements = [...state.elements];
-      newElements = newElements.filter((element) => {
-        return !isPointNearElement(element, clientX, clientY);
-      });
+      const filteredElements = state.elements.filter(
+        (element) => !isPointNearElement(element, clientX, clientY)
+      );
+
+      if (filteredElements.length === state.elements.length) {
+        return state;
+      }
+
       const newHistory = state.history.slice(0, state.index + 1);
-      newHistory.push(newElements);
+      newHistory.push(filteredElements);
+
       return {
         ...state,
-        elements: newElements,
+        elements: filteredElements,
         history: newHistory,
         index: state.index + 1,
       };
@@ -209,20 +214,27 @@ const BoardProvider = ({ children }) => {
     }
   };
 
-  const boardMouseUpHandler = () => {
-    if (boardState.toolActionType === TOOL_ACTION_TYPES.WRITING) return;
-    if (boardState.toolActionType === TOOL_ACTION_TYPES.DRAWING) {
-      dispatchBoardAction({
-        type: BOARD_ACTIONS.DRAW_UP,
-      });
-    }
+const boardMouseUpHandler = () => {
+  if (boardState.toolActionType === TOOL_ACTION_TYPES.WRITING) return;
+
+  if (
+    boardState.toolActionType === TOOL_ACTION_TYPES.DRAWING ||
+    boardState.toolActionType === TOOL_ACTION_TYPES.ERASING
+  ) {
     dispatchBoardAction({
-      type: BOARD_ACTIONS.CHANGE_ACTION_TYPE,
-      payload: {
-        actionType: TOOL_ACTION_TYPES.NONE,
-      },
+      type: BOARD_ACTIONS.DRAW_UP,
     });
-  };
+  }
+
+  dispatchBoardAction({
+    type: BOARD_ACTIONS.CHANGE_ACTION_TYPE,
+    payload: {
+      actionType: TOOL_ACTION_TYPES.NONE,
+    },
+  });
+};
+
+
 
   const textAreaBlurHandler = (text) => {
     dispatchBoardAction({
